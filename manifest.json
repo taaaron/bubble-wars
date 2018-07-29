@@ -1,0 +1,17 @@
+{
+  "appID": "98079d11749e4e618ab58140b25441da",
+  "dependencies": {
+    "devkit-core": "https://github.com/gameclosure/devkit-core#"
+  },
+  "shortName": "bubbleWars",
+  "studio": {
+    "domain": "studio.example.com",
+    "name": "Your Studio Name",
+    "stagingDomain": "staging.example.com"
+  },
+  "supportedOrientations": [
+    "portrait",
+    "landscape"
+  ],
+  "title": "bubbleWars"
+}
