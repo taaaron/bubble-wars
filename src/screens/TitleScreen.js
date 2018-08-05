@@ -17,18 +17,18 @@ exports = Class(View, function(supr) {
     }
 
     this.build = function() {
-
-        this.tvGameTitle = new TextView({
+        this.gameTitle = new TextView({
             superview: this,
             text: 'Bubble Wars',
             color: 'white',
-            x: 0,
+            x: 50,
             y: 100,
             width: 200,
-            height: 100
+            height: 100,
+            fontFamily: 'KenVector Future'
         });
 
-        var startButton = new ButtonView({
+        this.startButton = new ButtonView({
             superView: this,
             x: 58,
             y: 313,
@@ -36,7 +36,7 @@ exports = Class(View, function(supr) {
             height: 100
         });
 
-        startButton.on('InputSelect', bind(this, function() {
+        this.startButton.on('InputSelect', bind(this, function() {
             this.emit('StartGame');
         }));
     };

@@ -10,8 +10,11 @@
     "stagingDomain": "staging.example.com"
   },
   "supportedOrientations": [
-    "portrait",
-    "landscape"
+    "portrait"
   ],
-  "title": "bubbleWars"
+  "title": "Bubble Wars",
+  "fonts": [
+    "resources/fonts/kenvector_future_thin.ttf",
+    "resources/fonts/kenvector_future.ttf"
+  ]
 }
