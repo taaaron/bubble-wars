@@ -5,11 +5,16 @@ import ui.resource.Image as Image;
 
 import src.screens.TitleScreen as TitleScreen;
 import src.screens.GameScreen as GameScreen;
+import src.Globals as Globals;
 
-var bgImage = new Image({url: 'resources/images/space_bg.png'});
+Globals();
+
+var bgImage = new Image({url: 'resources/images/space_bg_ios2.png'});
 
 exports = Class(GC.Application, function () {
     this.initUI = function () {
+        GC.app.view.style.scale = device.screen.width / GLOBAL.BASE_WIDTH;
+
         var titlescreen = new TitleScreen(),
             gamescreen = new GameScreen();
 
@@ -17,20 +22,19 @@ exports = Class(GC.Application, function () {
             superview: this,
             x: 0,
             y: 0,
-            width: 320,
-            height: 480,
+            width: GLOBAL.BASE_WIDTH,
+            height: GLOBAL.BASE_HEIGHT,
             image: bgImage,
-            autoSize: true
+            clip: true
         });
 
         var rootView = new StackView({
             superview: bgView,
             x: 0,
             y: 0,
-            width: 320,
-            height: 480,
-            clip: true,
-            scale: device.width / 320
+            width: GLOBAL.BASE_WIDTH,
+            height: GLOBAL.BASE_HEIGHT,
+            clip: true
         });
 
         rootView.push(titlescreen);
@@ -38,6 +42,7 @@ exports = Class(GC.Application, function () {
         titlescreen.on('StartGame', function() {
             //TODO: Have ui fade out smoothly into loading screen
             //TODO: Loading screen, preload game assets, then bring in game screen
+            console.log('got emit');
             rootView.push(gamescreen);
         });
 
