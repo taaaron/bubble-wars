@@ -5,6 +5,7 @@ import ui.widget.ButtonView as ButtonView;
 exports = Class(View, function(supr) {
     this.init = function(opts) {
         opts = merge(opts, {
+            id: 'TitleScreen',
             x: 0,
             y: 0,
             wdith: GLOBAL.BASE_WIDTH,

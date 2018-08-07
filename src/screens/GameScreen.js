@@ -6,6 +6,7 @@ import src.gameObjects.GameController as GameController;
 exports = Class(View, function (supr) {
 	this.init = function (opts) {
 		opts = merge(opts, {
+			id: 'GameScreen',
 			x: 0,
 			y: 0,
 			width: GLOBAL.BASE_WIDTH,

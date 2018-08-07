@@ -7,15 +7,16 @@ import ui.ViewPool as ViewPool;
 import src.gameObjects.Bubble as Bubble;
 
 var shooterImg = new Image({url: 'resources/images/gameObjects/shooter.png'});
-var redBubbleImg = new Image({url: "resources/images/gameObjects/bubble_red.png"}),
-	blueBubbleImg = new Image({url: "resources/images/gameObjects/bubble_blue.png"}),
-	yellowBubbleImg = new Image({url: "resources/images/gameObjects/bubble_yellow.png"});
+var redBubbleImg = new Image({url: 'resources/images/gameObjects/bubble_red.png'}),
+	blueBubbleImg = new Image({url: 'resources/images/gameObjects/bubble_blue.png'}),
+	yellowBubbleImg = new Image({url: 'resources/images/gameObjects/bubble_yellow.png'});
 var dividedScale = 2.5;
 var shooterAngleAdjust = Math.PI / 3.6;
 
 exports = Class(View, function (supr) {
 	this.init = function (opts) {
 		opts = merge(opts, {
+			id: 'Shooter',
 			x: GLOBAL.BASE_WIDTH_CENTER - (shooterImg.getWidth() / dividedScale) / 2,
 			y: GLOBAL.BASE_HEIGHT * GLOBAL.BOARD_SCALE,
 			width:	shooterImg.getWidth() / dividedScale, //TODO: UPDATE THESE VALUES
@@ -37,23 +38,23 @@ exports = Class(View, function (supr) {
 		this.build();
 	};
 
-	this._getBubbleSpawnLocation = function(bubbleType, bubbleDiameter) {
+	this._getBubbleSpawnLocation = function(bubbleType) {
 		var x, y, r;
 
 		switch(bubbleType) {
 			case GLOBAL.BUBBLE_TYPES.RED:
-				x = GLOBAL.getViewCenterX(this) - (bubbleDiameter / 2);
+				x = GLOBAL.getViewCenterX(this) - (GLOBAL.BUBBLE_WIDTH / 2);
 				y = 0;
 				r = 0;
 				break;
 			case GLOBAL.BUBBLE_TYPES.BLUE:
-				x = this.style.width - bubbleDiameter - 15; //TODO: FIX THESE
-				y = this.style.height - bubbleDiameter - 41; //TODO: FIX THESE
+				x = this.style.width - GLOBAL.BUBBLE_WIDTH - 15; //TODO: FIX THESE
+				y = this.style.height - GLOBAL.BUBBLE_WIDTH - 41; //TODO: FIX THESE
 				r = 0;//(2 * Math.PI) / 3; TODO: FIX THESE
 				break;
 			case GLOBAL.BUBBLE_TYPES.YELLOW:
 				x = 15;
-				y = this.style.height - bubbleDiameter - 43; //TODO: FIX THESE
+				y = this.style.height - GLOBAL.BUBBLE_WIDTH - 43; //TODO: FIX THESE
 				r = 0;//(4 * Math.PI) / 3; TODO: FIX THESE
 		}
 		console.log({x: x, y: y, r: r});
@@ -63,7 +64,7 @@ exports = Class(View, function (supr) {
 	this._loadRedBubble = function() {
 		this._redBubble = this.bubbleViewPool.obtainView();
 
-		var spawnLocation = this._getBubbleSpawnLocation(GLOBAL.BUBBLE_TYPES.RED, this._redBubble.style.width);
+		var spawnLocation = this._getBubbleSpawnLocation(GLOBAL.BUBBLE_TYPES.RED);
 		var opts = merge(spawnLocation, {
 			superview: this,
 			image: redBubbleImg,
@@ -78,7 +79,7 @@ exports = Class(View, function (supr) {
 	this._loadBlueBubble = function() {
 		this._blueBubble = this.bubbleViewPool.obtainView();
 
-		var spawnLocation = this._getBubbleSpawnLocation(GLOBAL.BUBBLE_TYPES.BLUE, this._blueBubble.style.width);
+		var spawnLocation = this._getBubbleSpawnLocation(GLOBAL.BUBBLE_TYPES.BLUE);
 		var opts = merge(spawnLocation, {
 			superview: this,
 			image: blueBubbleImg,
@@ -93,7 +94,7 @@ exports = Class(View, function (supr) {
 	this._loadYellowBubble = function() {
 		this._yellowBubble = this.bubbleViewPool.obtainView();
 
-		var spawnLocation = this._getBubbleSpawnLocation(GLOBAL.BUBBLE_TYPES.YELLOW, this._yellowBubble.style.width);
+		var spawnLocation = this._getBubbleSpawnLocation(GLOBAL.BUBBLE_TYPES.YELLOW);
 		var opts = merge(spawnLocation, {
 			superview: this,
 			image: yellowBubbleImg,
@@ -144,7 +145,6 @@ exports = Class(View, function (supr) {
 		/* Create an animator object for shooter.
 		 */
 		this._animator = animate(this);
-		this._interval = null;
 
 		this._shooterView.on('InputSelect', bind(this, function () {
 			console.log('clicked!');
