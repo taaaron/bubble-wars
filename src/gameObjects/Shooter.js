@@ -16,12 +16,14 @@ var shooterAngleAdjust = Math.PI / 3.6;
 exports = Class(View, function (supr) {
 	this.init = function (opts) {
 		opts = merge(opts, {
-			id: 'Shooter',
+			tag: 'Shooter',
 			x: GLOBAL.BASE_WIDTH_CENTER - (shooterImg.getWidth() / dividedScale) / 2,
 			y: GLOBAL.BASE_HEIGHT * GLOBAL.BOARD_SCALE,
 			width:	shooterImg.getWidth() / dividedScale, //TODO: UPDATE THESE VALUES
 			height: shooterImg.getHeight() / dividedScale,
-			centerAnchor: true
+			centerAnchor: true,
+			centerX: true,
+			centerY: true
 		});
 
 		supr(this, 'init', [opts]);

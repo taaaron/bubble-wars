@@ -14,6 +14,7 @@ var bgImage = new Image({url: 'resources/images/space_bg_ios2.png'});
 exports = Class(GC.Application, function () {
     this.initUI = function () {
         GC.app.view.style.scale = device.screen.width / GLOBAL.BASE_WIDTH;
+        GLOBAL.SCALE = GC.app.view.style.scale;
 
         var titlescreen = new TitleScreen(),
             gamescreen = new GameScreen();

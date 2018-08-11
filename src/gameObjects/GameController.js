@@ -1,17 +1,62 @@
 import ui.View as View;
+import math.geom.intersect as intersect;
+import math.geom.Line as Line;
 
 import src.gameObjects.GameBoard as GameBoard;
 
 exports = Class(View, function(supr) {
     this.init = function(opts) {
         opts = merge(opts, {
-            id: 'GameController',
+            tag: 'GameController',
 			infinite: true
         });
 
         supr(this, 'init', [opts]);
 
         this.build();
+    };
+
+    this.checkBubbleCollision = function(aimLine) {
+        //returns closest colliding bubble or null
+        //Need position for where new bubble would be as well
+
+        var bubbleGrid = this.gameBoard.bubbleGrid;
+        var returnBubble = null;
+
+        for(var bubbleRow of bubbleGrid) {
+            for(var bubble of bubbleRow.bubbles) {
+                if(bubble) {
+                    if(intersect.circleAndLine(bubble.collisionCircle, aimLine)) {
+                        if(returnBubble) {
+                            console.log('2');
+                            //console.log(bubble.getPosition());
+                            //console.log(aimLine.start);
+                            var currLine = new Line(bubble.getPosition(), aimLine.start);
+                            var prevLine = new Line(returnBubble.getPosition(), aimLine.start);
+
+                            if(currLine.getLength() < prevLine.getLength()) {
+                                returnBubble = bubble;
+                            }
+                            //console.log(distanceLine);
+                        } else {
+                            console.log('1');
+                            returnBubble = bubble;
+                        }
+                    }
+                }
+            }
+        }
+
+        return returnBubble;
+    };
+
+    this.snapBubble = function(x, y) {
+        //snap bubble to given position in given bubble row
+        //then decide if bubbles should dissapear and make any bubbles not connected to an enemy drop
+    };
+
+    this.showMoreBoard = function() {
+        //decide how much more of board to show
     };
 
     this.build = function() {

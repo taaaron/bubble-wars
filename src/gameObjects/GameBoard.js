@@ -13,7 +13,7 @@ console.log(redBubbleImg.getWidth());
 exports = Class(View, function(supr) {
     this.init = function(opts) {
         opts = merge(opts, {
-            id: 'GameBoard',
+            tag: 'GameBoard',
             width: GLOBAL.BASE_WIDTH,
             height: GLOBAL.BASE_HEIGHT * GLOBAL.BOARD_SCALE
         });
@@ -46,7 +46,9 @@ exports = Class(View, function(supr) {
             type: type,
             image: image,
             x: x * GLOBAL.BUBBLE_WIDTH,
-            y: 0
+            y: 0,
+            bubbleRow: y,
+            bubbleCol: x
         });
 
         return bubble;
@@ -65,6 +67,8 @@ exports = Class(View, function(supr) {
             for(var x = 0; x < layout[y].length; x++) {
                 if(layout[y][x] !== 'e') {
                     row.bubbles.push(this._spawnBubble(layout[y][x], x, y, row));
+                } else {
+                    row.bubbles.push(null);
                 }
             }
             this.bubbleGrid.push(row);
