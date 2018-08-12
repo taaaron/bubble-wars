@@ -18,10 +18,12 @@ exports = Class(View, function(supr) {
         this.build();
     };
 
-    this.checkBubbleCollision = function(aimLine) {
-        //returns closest colliding bubble or null
-        //Need position for where new bubble would be as well
+    this._adjustGridPoint = function(point) {
+        return point.translate(GLOBAL.BUBBLE_WIDTH / 2, GLOBAL.BUBBLE_WIDTH / 2);
+    };
 
+    //returns closest colliding bubble or null
+    this.checkBubbleCollision = function(aimLine) {
         var bubbleGrid = this.gameBoard.bubbleGrid;
         var returnBubble = null;
 
@@ -30,18 +32,13 @@ exports = Class(View, function(supr) {
                 if(bubble) {
                     if(intersect.circleAndLine(bubble.collisionCircle, aimLine)) {
                         if(returnBubble) {
-                            console.log('2');
-                            //console.log(bubble.getPosition());
-                            //console.log(aimLine.start);
                             var currLine = new Line(bubble.getPosition(), aimLine.start);
                             var prevLine = new Line(returnBubble.getPosition(), aimLine.start);
 
                             if(currLine.getLength() < prevLine.getLength()) {
                                 returnBubble = bubble;
                             }
-                            //console.log(distanceLine);
                         } else {
-                            console.log('1');
                             returnBubble = bubble;
                         }
                     }
@@ -56,19 +53,39 @@ exports = Class(View, function(supr) {
         var spaceX = space.bubbleCol * GLOBAL.BUBBLE_WIDTH;
         var spaceY = space.bubbleRow * GLOBAL.BUBBLE_WIDTH * this.gameBoard.getRowYModifier();
 
-        if(space.bubbleCol % 2 === 0) 
+        if(space.bubbleRow % 2 === 0) 
             spaceX = spaceX + GLOBAL.BUBBLE_WIDTH / 2
 
         return new Point({x: spaceX, y: spaceY});
     };
 
-    this.getOpenGridSpace = function(bubble, collidePoint) {
-        var returnSpace = null;
-        var openGridSpaces = bubble.getOpenNeighborSpaces();
-        var returnSpaceDistance, currSpaceDistance;
+    this.getOpenNeighborSpaces = function(bubble) {
+        var row, col;
+        var maxCol = this.gameBoard.getGridSizeX() - 1;
+        var maxRow = this.gameBoard.getGridSizeY() - 1;
+        var openSpaces = [];
 
-        for(var space in openGridSpaces) {
-            currSpaceDistance = utils.getDistance(this.getGridSpacePoint(space), collidePoint);
+		for(offset of bubble.neighborOffsets) {
+            row = bubble.bubbleRow + offset.y;
+            col = bubble.bubbleCol + offset.x;
+            if(row >= 0 && row <= maxRow && col >= 0 && col <= maxCol) {
+                if(this.gameBoard.bubbleGrid[row].bubbles[col] === null) {
+                    openSpaces.push({bubbleCol: col, bubbleRow: row});
+                }
+            }
+        }
+        
+        return openSpaces;
+    };
+
+    this.determineGridSpace = function(bubble, collidePoint) {
+        var returnSpace = null;
+        var openGridSpaces = this.getOpenNeighborSpaces(bubble);
+        var returnSpaceDistance, currSpaceDistance, adjustedGridPoint;
+
+        for(var space of openGridSpaces) {
+            adjustedGridPoint = this._adjustGridPoint(this.getGridSpacePoint(space));
+            currSpaceDistance = utils.getDistance(adjustedGridPoint, collidePoint);
             if(returnSpace) {
                 if(currSpaceDistance < returnSpaceDistance) {
                     returnSpace = space;
@@ -81,11 +98,105 @@ exports = Class(View, function(supr) {
         }
 
         return returnSpace;
-	};
+    };
+    
+    this.getNextBubble = function(bubble, collidePoint, visitedBubbles) {
+        var returnBubble = null;
+        var maxCol = this.gameBoard.getGridSizeX() - 1;
+        var maxRow = this.gameBoard.getGridSizeY() - 1;
+        var row, col, returnDistance, currDistance, tempBubble;
 
-    this.snapBubble = function(x, y) {
+        for(offset of bubble.neighborOffsets) {
+            row = bubble.bubbleRow + offset.y;
+            col = bubble.bubbleCol + offset.x;
+            if(row >= 0 && row <= maxRow && col >= 0 && col <= maxCol) {
+                tempBubble = this.gameBoard.bubbleGrid[row].bubbles[col];
+                if(tempBubble && !visitedBubbles.includes(tempBubble)) {
+                    currDistance = utils.getDistance(tempBubble.getPosition(), collidePoint);
+                    if(returnBubble) {
+                        if(currDistance < returnDistance) {
+                            returnBubble = tempBubble;
+                            returnDistance = currDistance;
+                        }
+                    } else {
+                        returnBubble = tempBubble;
+                        returnDistance = currDistance;
+                    }
+                }
+            }
+        }
+
+        return returnBubble;
+    };
+
+    this.findIslands = function() {
+
+    };
+
+    this.findCluster = function(bubble) {
+        var stack = [bubble];
+        var visitedBubbles = [bubble];
+        var cluster = [];
+        var currBubble;
+
+        while(stack.length !== 0) {
+            currBubble = stack.pop();
+            cluster.push(currBubble);
+
+            //find all neighbors that have same type and havnt been visited add them to stack
+            var maxCol = this.gameBoard.getGridSizeX() - 1;
+            var maxRow = this.gameBoard.getGridSizeY() - 1;
+            var row, col, tempBubble;
+    
+            for(offset of currBubble.neighborOffsets) {
+                row = currBubble.bubbleRow + offset.y;
+                col = currBubble.bubbleCol + offset.x;
+                if(row >= 0 && row <= maxRow && col >= 0 && col <= maxCol) {
+                    tempBubble = this.gameBoard.bubbleGrid[row].bubbles[col];
+                    if(tempBubble && !visitedBubbles.includes(tempBubble) && tempBubble.type === bubble.type) {
+                        stack.push(tempBubble);
+                        visitedBubblespush(tempBubble);
+                    }
+                }
+            }
+        }
+
+        if(cluster >= 3) {
+            //remove all 
+            //make sure to check if need to be released by view pool
+            for(bubble of cluster) {
+                bubble.removeFromSuperView();
+                if(bubble.isFromPool)
+                    this.getSuperview().playerController.shooter.releaseBubbleView(bubble);
+            }
+        }
+
+        //find islands? Go to each enemy and find all bubbles connected to them. MAke sure not to go over ones already visited. Then delete all bubbles that don't connect
+    };
+
+    this.snapToNearestSpace = function() {
+
+    };
+
+    this.snapBubble = function(x, y, bubble) {
         //snap bubble to given position in given bubble row
         //then decide if bubbles should dissapear and make any bubbles not connected to an enemy drop
+        var newRow = this.gameBoard.bubbleGrid[y];
+        console.log(x, y);
+        bubble.updateOpts({
+            superview: newRow,
+            x: x * BUBBLE_WIDTH,
+            y: 0,
+        });
+        bubble.bubbleRow = y;
+        bubble.bubbleCol = x;
+        bubble.determineNeighborOffsets();
+        bubble.updateCollisionCircleWithScale();
+        newRow.bubbles[x] = bubble;
+
+        console.log(bubble);
+
+        //this.findCluster(bubble);
     };
 
     this.showMoreBoard = function() {

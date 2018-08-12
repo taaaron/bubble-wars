@@ -2,6 +2,7 @@ import animate;
 import ui.ImageView as ImageView;
 import ui.resource.Image as Image;
 import math.geom.Circle as Circle;
+import math.geom.Point as Point;
 
 var redBubbleImg = new Image({url: 'resources/images/gameObjects/bubble_red.png'});
 var adjustForImg = 5;
@@ -15,7 +16,8 @@ exports = Class(ImageView, function (supr) {
 			image: redBubbleImg,
 			type: GLOBAL.BUBBLE_TYPES.RED,
 			bubbleRow: 0,
-			bubbleCol: 0
+			bubbleCol: 0,
+			isFromPool: false
 		});
 
 		supr(this, 'init', [opts]);
@@ -23,48 +25,56 @@ exports = Class(ImageView, function (supr) {
 		this.type = opts.type;
 		this.bubbleRow = opts.bubbleRow;
 		this.bubbleCol = opts.bubbleCol;
+		this.isFromPool = opts.isFromPool;
 
 		this.build();
 	};
 
-	this.getOpenNeighborSpaces = function() {
-		this.neighborArray
+	this.determineNeighborOffsets = function() {
+		var determinedOffsets = [];
+
+		if(this.bubbleRow % 2 === 1) {
+			determinedOffsets = [
+				{x: 1, y: 0},
+				{x: -1, y: 0},
+				{x: 0, y: 1},
+				{x: 0, y: -1},
+				{x: -1, y: 1},
+				{x: -1, y: -1},
+			];
+		} else {
+			determinedOffsets = [
+				{x: 1, y: 0},
+				{x: -1, y: 0},
+				{x: 0, y: 1},
+				{x: 0, y: -1},
+				{x: 1, y: 1},
+				{x: 1, y: -1},
+			];
+		}
+
+		return determinedOffsets;
 	};
 
-	this._determineNeighbors = function() {
-		var maxBubbleCol = this.getSuperview().getSuperview().getGridSizeX();
-		var maxBubbleRow = this.getSuperview().getSuperview().getGridSizeY();
-		var determinedNeighbors = [];
-
-		if(bubbleCol % 2 === 1) {
-			determinedNeighbors.push();
-		}
-		if(bubbleCol !== 0) {
-			
-		}
-		if(bubbleRow !== 0) {
-
-		}
-		if(bubbleCol !== maxBubbleCol) {
-
-		}
-		if(bubbleRow !== maxBubbleRow) {
-
-		}
-
-	};
-
-	this.build = function () {
+	this.updateCollisionCircle = function() {
 		var centerX = this.getPosition().x - adjustForImg + (GLOBAL.BUBBLE_WIDTH / 2);
 		var centerY = this.getPosition().y - adjustForImg + (GLOBAL.BUBBLE_WIDTH / 2);
 		this.collisionCircle = new Circle(centerX, centerY, GLOBAL.BUBBLE_WIDTH / 2);
+	};
 
-		//this.neighborArray = this._determineNeighbors();
+	this.updateCollisionCircleWithScale = function() {
+		var scaledPos = new Point(this.getPosition()).scale(1/GLOBAL.SCALE);
+		var centerX = scaledPos.x - adjustForImg + (GLOBAL.BUBBLE_WIDTH / 2);
+		var centerY = scaledPos.y - adjustForImg + (GLOBAL.BUBBLE_WIDTH / 2);
+		this.collisionCircle = new Circle(centerX, centerY, GLOBAL.BUBBLE_WIDTH / 2);
+	};
 
-		
+	this.build = function () {
+		this.updateCollisionCircle();
+		this.neighborOffsets = this.determineNeighborOffsets();
 
 		/* Create an animator object for bubble.
 		 */
-		this._animator = animate(this);
+		this.animator = animate(this);
 	};
 });

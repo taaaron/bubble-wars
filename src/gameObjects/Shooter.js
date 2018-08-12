@@ -33,13 +33,21 @@ exports = Class(View, function (supr) {
 			initCount: 15,
 			initOpts: {
 				superview: this,
-				type: GLOBAL.BUBBLE_TYPES.RED
+				type: GLOBAL.BUBBLE_TYPES.RED,
+				isFromPool: true
 			}
 		});
+
+		this.loadedBubbles = {
+			[GLOBAL.BUBBLE_TYPES.RED]: null,
+			[GLOBAL.BUBBLE_TYPES.BLUE]: null,
+			[GLOBAL.BUBBLE_TYPES.YELLOW]: null
+		};
 
 		this.build();
 	};
 
+	//TODO: FIX THIS
 	this._getBubbleSpawnLocation = function(bubbleType) {
 		var x, y, r;
 
@@ -76,6 +84,7 @@ exports = Class(View, function (supr) {
 		});
 
 		this._redBubble.updateOpts(opts);
+		this.loadedBubbles[GLOBAL.BUBBLE_TYPES.RED] = this._redBubble;
 	};
 
 	this._loadBlueBubble = function() {
@@ -91,6 +100,7 @@ exports = Class(View, function (supr) {
 		});
 
 		this._blueBubble.updateOpts(opts);
+		this.loadedBubbles[GLOBAL.BUBBLE_TYPES.BLUE] = this._blueBubble;
 	};
 
 	this._loadYellowBubble = function() {
@@ -106,10 +116,7 @@ exports = Class(View, function (supr) {
 		});
 
 		this._yellowBubble.updateOpts(opts);
-	};
-
-	this._setAmmo = function() {
-
+		this.loadedBubbles[GLOBAL.BUBBLE_TYPES.YELLOW] = this._yellowBubble;
 	};
 
 	this._rotateShooter = function() {
@@ -118,13 +125,48 @@ exports = Class(View, function (supr) {
 
 		var rotation = this.style.r + ((2 * Math.PI) / 3);
 		this._animator.then({r: rotation}, 300, animate.easeInOut);
-
-		console.log(rotation);
-		console.log(this.style.r);
+		this.getSuperview().switchAmmo(); //TODO: switch getSuperview to getParent and then search by tag
 	};
 
-	this.shootBubble = function() {
+	this._reloadAmmo = function(ammoType) {
+		if(this.getSuperview().ammo[ammoType] > 0)
+		{
+			switch(ammoType) {
+				case GLOBAL.BUBBLE_TYPES.RED:
+					this._loadRedBubble();
+					break;
+				case GLOBAL.BUBBLE_TYPES.BLUE:
+					this._loadBlueBubble();
+					break;
+				case GLOBAL.BUBBLE_TYPES.YELLOW:
+					this._loadYellowBubble();
+			}
+		}
+	};
 
+	this.releaseBubbleView = function(bubble) {
+		this.bubbleViewPool.releaseView(bubble);
+	};
+
+	this.shootBubble = function(ammoType, positions, gridSpace, gameController) {
+		//play sound
+		var loadedBubble = this.loadedBubbles[ammoType];
+
+		this.getSuperview().ammo[ammoType]--;
+		loadedBubble.updateOpts({
+			superview: this.getSuperview(),
+			x: loadedBubble.getPosition(this.getSuperview()).x,
+			y: loadedBubble.getPosition(this.getSuperview()).y
+		});
+		for(var position of positions) {
+			//Keep bubble from going off screen
+			position.x = position.x > GLOBAL.BASE_WIDTH - GLOBAL.BUBBLE_WIDTH ? GLOBAL.BASE_WIDTH - GLOBAL.BUBBLE_WIDTH : position.x;
+			loadedBubble.animator.then({x: position.x, y: position.y}, 100, 'easeOutCubic')
+		}
+		loadedBubble.animator.then(bind(this, function() {
+			gameController.snapBubble(gridSpace.bubbleCol, gridSpace.bubbleRow, loadedBubble);
+			this._reloadAmmo(ammoType);
+		}));
 	};
 
 	this.build = function () {
@@ -151,9 +193,6 @@ exports = Class(View, function (supr) {
 		this._shooterView.on('InputSelect', bind(this, function () {
 			console.log('clicked!');
 			//play sound
-			//rotate shooterView
-			//set currAmmo to correct color
-	
 			this._rotateShooter();
 		}));
 

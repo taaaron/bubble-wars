@@ -26,6 +26,8 @@ exports = function() {
 
     GLOBAL.BUBBLE_WIDTH = GLOBAL.BASE_BUBBLE_WIDTH * GLOBAL.BUBBLE_SCALE;
 
+    GLOBAL.MAX_GRID_SIZE_X = 11;
+
     GLOBAL.getViewCenterX = function(view) {
         return view.style.width / 2;
     };
