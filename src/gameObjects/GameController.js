@@ -1,8 +1,10 @@
 import ui.View as View;
 import math.geom.intersect as intersect;
 import math.geom.Line as Line;
+import math.geom.Point as Point;
 
 import src.gameObjects.GameBoard as GameBoard;
+import src.utils as utils;
 
 exports = Class(View, function(supr) {
     this.init = function(opts) {
@@ -49,6 +51,37 @@ exports = Class(View, function(supr) {
 
         return returnBubble;
     };
+
+    this.getGridSpacePoint = function(space) {
+        var spaceX = space.bubbleCol * GLOBAL.BUBBLE_WIDTH;
+        var spaceY = space.bubbleRow * GLOBAL.BUBBLE_WIDTH * this.gameBoard.getRowYModifier();
+
+        if(space.bubbleCol % 2 === 0) 
+            spaceX = spaceX + GLOBAL.BUBBLE_WIDTH / 2
+
+        return new Point({x: spaceX, y: spaceY});
+    };
+
+    this.getOpenGridSpace = function(bubble, collidePoint) {
+        var returnSpace = null;
+        var openGridSpaces = bubble.getOpenNeighborSpaces();
+        var returnSpaceDistance, currSpaceDistance;
+
+        for(var space in openGridSpaces) {
+            currSpaceDistance = utils.getDistance(this.getGridSpacePoint(space), collidePoint);
+            if(returnSpace) {
+                if(currSpaceDistance < returnSpaceDistance) {
+                    returnSpace = space;
+                    returnSpaceDistance = currSpaceDistance;
+                }
+            } else {
+                returnSpace = space;
+                returnSpaceDistance = currSpaceDistance;
+            } 
+        }
+
+        return returnSpace;
+	};
 
     this.snapBubble = function(x, y) {
         //snap bubble to given position in given bubble row

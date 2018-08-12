@@ -66,12 +66,10 @@ exports = Class(View, function (supr) {
 			return null;
 		}
 
-		var intersectNormal = intersect.pointToLine(collideBubble.collisionCircle, aimLine);
+		var collidePoint = utils.getLineCircleIntersection(aimLine, collideBubble.collisionCircle);
+		console.log(collidePoint);
 
-		//Check if line is tangect to circle
-		if(intersectNormal === collideBubble.collisionCircle.r)
-
-		console.log(intersectNormal);
+		var location = this.getSuperview().gameController.getOpenGridSpace(collideBubble, collidePoint);
 	};
 
 	this._buildAimLine = function(shooterPos, fingerPoint, angle) {

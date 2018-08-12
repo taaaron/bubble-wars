@@ -54,13 +54,25 @@ exports = Class(View, function(supr) {
         return bubble;
     };
 
+    this.getRowYModifier = function() {
+        return (4/5);
+    };
+
+    this.getGridSizeX = function() {
+        return layout[0].length;
+    };
+
+    this.getGridSizeY = function() {
+        return layout.length;
+    }
+
     this.build = function() {
         for(var y = 0; y < layout.length; y++){
             var row = new BubbleRow({
                 superview: this,
                 x: y % 2 === 1 ? 0 : GLOBAL.BUBBLE_WIDTH / 2,
-                y: y * (GLOBAL.BUBBLE_WIDTH * (4/5)),
-                width: GLOBAL.BUBBLE_WIDTH * 11,
+                y: y * (GLOBAL.BUBBLE_WIDTH * this.getRowYModifier(),
+                width: GLOBAL.BUBBLE_WIDTH * this.getGridSizeX(),
                 height: GLOBAL.BUBBLE_WIDTH
             });
 
