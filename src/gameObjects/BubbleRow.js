@@ -13,6 +13,15 @@ exports = Class(View, function(supr) {
         this.build();
     };
 
+    this.isRowNull = function() {
+        for(var bubble of this.bubbles) {
+            if(bubble !== null) {
+                return false;
+            }
+        }
+        return true;
+    };
+
     this.build = function() {
 
     };

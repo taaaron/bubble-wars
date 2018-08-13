@@ -9,7 +9,8 @@ exports = function() {
         RED: 'r',
         BLUE: 'b',
         YELLOW: 'y',
-        EMPTY: 'e'
+        NULL: 'n',
+        ENEMY: 'e'
     };
     
     GLOBAL.BASE_WIDTH = 576;
@@ -22,11 +23,13 @@ exports = function() {
     GLOBAL.BASE_HEIGHT_CENTER = GLOBAL.BASE_HEIGHT / 2;
 
     GLOBAL.BOARD_SCALE = 0.6;
+    GLOBAL.HUD_SCALE = 0.9;
     GLOBAL.BUBBLE_SCALE = 0.625;
 
     GLOBAL.BUBBLE_WIDTH = GLOBAL.BASE_BUBBLE_WIDTH * GLOBAL.BUBBLE_SCALE;
 
     GLOBAL.MAX_GRID_SIZE_X = 11;
+    GLOBAL.MAX_ROWS_ON_SCREEN = 13;
 
     GLOBAL.getViewCenterX = function(view) {
         return view.style.width / 2;

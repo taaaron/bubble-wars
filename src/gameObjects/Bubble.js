@@ -5,7 +5,8 @@ import math.geom.Circle as Circle;
 import math.geom.Point as Point;
 
 var redBubbleImg = new Image({url: 'resources/images/gameObjects/bubble_red.png'});
-var adjustForImg = 5;
+var adjustForImgX = 0;
+var adjustForImgY = 10;
 
 exports = Class(ImageView, function (supr) {
 	this.init = function (opts) {
@@ -26,6 +27,7 @@ exports = Class(ImageView, function (supr) {
 		this.bubbleRow = opts.bubbleRow;
 		this.bubbleCol = opts.bubbleCol;
 		this.isFromPool = opts.isFromPool;
+		this.enemy = null;
 
 		this.build();
 	};
@@ -57,18 +59,18 @@ exports = Class(ImageView, function (supr) {
 	};
 
 	this.updateCollisionCircle = function() {
-		var centerX = this.getPosition().x - adjustForImg + (GLOBAL.BUBBLE_WIDTH / 2);
-		var centerY = this.getPosition().y - adjustForImg + (GLOBAL.BUBBLE_WIDTH / 2);
+		var centerX = this.getPosition().x - adjustForImgX + (GLOBAL.BUBBLE_WIDTH / 2);
+		var centerY = this.getPosition().y - adjustForImgY + (GLOBAL.BUBBLE_WIDTH / 2);
 		this.collisionCircle = new Circle(centerX, centerY, GLOBAL.BUBBLE_WIDTH / 2);
 	};
 
 	this.updateCollisionCircleWithScale = function() {
 		var scaledPos = new Point(this.getPosition()).scale(1/GLOBAL.SCALE);
-		var centerX = scaledPos.x - adjustForImg + (GLOBAL.BUBBLE_WIDTH / 2);
-		var centerY = scaledPos.y - adjustForImg + (GLOBAL.BUBBLE_WIDTH / 2);
+		var centerX = scaledPos.x - adjustForImgX + (GLOBAL.BUBBLE_WIDTH / 2);
+		var centerY = scaledPos.y - adjustForImgY + (GLOBAL.BUBBLE_WIDTH / 2);
 		this.collisionCircle = new Circle(centerX, centerY, GLOBAL.BUBBLE_WIDTH / 2);
 	};
-
+	
 	this.build = function () {
 		this.updateCollisionCircle();
 		this.neighborOffsets = this.determineNeighborOffsets();

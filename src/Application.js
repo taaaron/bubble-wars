@@ -6,13 +6,13 @@ import ui.resource.Image as Image;
 import src.screens.TitleScreen as TitleScreen;
 import src.screens.GameScreen as GameScreen;
 import src.Globals as Globals;
-
-Globals();
+import src.AudioManager as AudioManager;
 
 var bgImage = new Image({url: 'resources/images/space_bg_ios2.png'});
 
 exports = Class(GC.Application, function () {
     this.initUI = function () {
+        Globals();
         GC.app.view.style.scale = device.screen.width / GLOBAL.BASE_WIDTH;
         GLOBAL.SCALE = GC.app.view.style.scale;
 
@@ -38,16 +38,18 @@ exports = Class(GC.Application, function () {
             clip: true
         });
 
-        rootView.push(titlescreen);
+        this.audioManager = AudioManager.getAudioManager();
 
-        titlescreen.on('StartGame', function() {
+        rootView.push(titlescreen);
+        this.audioManager.play('bgMusic');
+
+        titlescreen.on('Start Game', function() {
             //TODO: Have ui fade out smoothly into loading screen
             //TODO: Loading screen, preload game assets, then bring in game screen
-            console.log('got emit');
             rootView.push(gamescreen);
         });
 
-        gamescreen.on('EndGame', function() {
+        gamescreen.on('End Game', function() {
             //TODO: Fade out smoothly into loading screen
             //TODO: Loading screen, preload menu assets, then title screen
             rootView.pop();

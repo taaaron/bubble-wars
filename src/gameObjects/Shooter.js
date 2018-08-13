@@ -3,6 +3,7 @@ import ui.View as View;
 import ui.ImageView as ImageView;
 import ui.resource.Image as Image;
 import ui.ViewPool as ViewPool;
+import math.geom.Point as Point;
 
 import src.gameObjects.Bubble as Bubble;
 
@@ -47,7 +48,6 @@ exports = Class(View, function (supr) {
 		this.build();
 	};
 
-	//TODO: FIX THIS
 	this._getBubbleSpawnLocation = function(bubbleType) {
 		var x, y, r;
 
@@ -58,17 +58,16 @@ exports = Class(View, function (supr) {
 				r = 0;
 				break;
 			case GLOBAL.BUBBLE_TYPES.BLUE:
-				x = this.style.width - GLOBAL.BUBBLE_WIDTH - 15; //TODO: FIX THESE
-				y = this.style.height - GLOBAL.BUBBLE_WIDTH - 41; //TODO: FIX THESE
-				r = 0;//(2 * Math.PI) / 3; TODO: FIX THESE
+				x = GLOBAL.getViewCenterX(this) - Math.cos(Math.PI / 6) * (getViewCenterX(this) + 5);
+				y = GLOBAL.getViewCenterY(this) + Math.sin(Math.PI / 6) * (getViewCenterY(this)) - Math.sin(Math.PI / 6) * (GLOBAL.BUBBLE_WIDTH * 1.5);
+				r = 0;
 				break;
 			case GLOBAL.BUBBLE_TYPES.YELLOW:
-				x = 15;
-				y = this.style.height - GLOBAL.BUBBLE_WIDTH - 43; //TODO: FIX THESE
-				r = 0;//(4 * Math.PI) / 3; TODO: FIX THESE
+				x = GLOBAL.getViewCenterX(this) + Math.cos(Math.PI / 6) * (getViewCenterX(this)) - Math.sin(Math.PI / 6) * (GLOBAL.BUBBLE_WIDTH * 1.85);
+				y = GLOBAL.getViewCenterY(this) + Math.sin(Math.PI / 6) * (getViewCenterY(this)) - Math.sin(Math.PI / 6) * (GLOBAL.BUBBLE_WIDTH * 1.5);
+				r = 0;
 		}
-		console.log({x: x, y: y, r: r});
-		return {x: x, y: y, r: r};
+		return new Point({x: x, y: y, r: r});
 	};
 
 	this._loadRedBubble = function() {
@@ -84,6 +83,7 @@ exports = Class(View, function (supr) {
 		});
 
 		this._redBubble.updateOpts(opts);
+		this._redBubble.type = GLOBAL.BUBBLE_TYPES.RED;
 		this.loadedBubbles[GLOBAL.BUBBLE_TYPES.RED] = this._redBubble;
 	};
 
@@ -100,6 +100,7 @@ exports = Class(View, function (supr) {
 		});
 
 		this._blueBubble.updateOpts(opts);
+		this._blueBubble.type = GLOBAL.BUBBLE_TYPES.BLUE;
 		this.loadedBubbles[GLOBAL.BUBBLE_TYPES.BLUE] = this._blueBubble;
 	};
 
@@ -116,6 +117,7 @@ exports = Class(View, function (supr) {
 		});
 
 		this._yellowBubble.updateOpts(opts);
+		this._yellowBubble.type = GLOBAL.BUBBLE_TYPES.YELLOW;
 		this.loadedBubbles[GLOBAL.BUBBLE_TYPES.YELLOW] = this._yellowBubble;
 	};
 
@@ -152,7 +154,7 @@ exports = Class(View, function (supr) {
 		//play sound
 		var loadedBubble = this.loadedBubbles[ammoType];
 
-		this.getSuperview().ammo[ammoType]--;
+		this.getSuperview().updateAmmo(ammoType, -1);
 		loadedBubble.updateOpts({
 			superview: this.getSuperview(),
 			x: loadedBubble.getPosition(this.getSuperview()).x,
@@ -161,7 +163,7 @@ exports = Class(View, function (supr) {
 		for(var position of positions) {
 			//Keep bubble from going off screen
 			position.x = position.x > GLOBAL.BASE_WIDTH - GLOBAL.BUBBLE_WIDTH ? GLOBAL.BASE_WIDTH - GLOBAL.BUBBLE_WIDTH : position.x;
-			loadedBubble.animator.then({x: position.x, y: position.y}, 100, 'easeOutCubic')
+			loadedBubble.animator.then({x: position.x, y: position.y}, 150, 'easeOutCubic')
 		}
 		loadedBubble.animator.then(bind(this, function() {
 			gameController.snapBubble(gridSpace.bubbleCol, gridSpace.bubbleRow, loadedBubble);

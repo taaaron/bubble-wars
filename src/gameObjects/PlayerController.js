@@ -57,6 +57,9 @@ exports = Class(View, function (supr) {
 		var gridSpace = null;
 		var targetBubble = collideBubble;
 		var visitedBubbles = [];
+
+		console.log('collideBubble', collideBubble);
+		console.log('collidePoint', collidePoint);
 		
 		while(gridSpace === null) {
 			gridSpace = this.getSuperview().gameController.determineGridSpace(targetBubble, collidePoint);
@@ -111,6 +114,10 @@ exports = Class(View, function (supr) {
 			collidePoint = utils.getLineCircleIntersection(aimLine, collideBubble.collisionCircle);
 			reticlePos = this._getReticlePos(collideBubble, collidePoint);
 
+			console.log(collideBubble);
+			console.log(collidePoint);
+			console.log(reticlePos);
+
 			this._aimLaserView.updateOpts({
 				x: collidePoint.x,
 				y: collidePoint.y,
@@ -135,6 +142,7 @@ exports = Class(View, function (supr) {
 				aimLine = new Line(aimLine.start, aimEnd);
 				bounceLine = this._buildBounceLine(aimLine);
 				bounceRotation = utils.getAngle2(bounceLine.start, bounceLine.end) - Math.PI/2;
+				console.log('bounceLine', bounceLine);
 				collideBubble = this.getSuperview().gameController.checkBubbleCollision(bounceLine);
 			} else if(utils.getLineLineIntersection(aimLine, this.rightBound)  && fingerPoint.x > GLOBAL.BASE_WIDTH_CENTER) {
 				//bounce off right side
@@ -142,6 +150,7 @@ exports = Class(View, function (supr) {
 				aimLine = new Line(aimLine.start, aimEnd);
 				bounceLine = this._buildBounceLine(aimLine);
 				bounceRotation = utils.getAngle2(bounceLine.start, bounceLine.end) - Math.PI/2;
+				console.log('bounceLine', bounceLine);
 				collideBubble = this.getSuperview().gameController.checkBubbleCollision(bounceLine);
 			}
 
@@ -192,6 +201,8 @@ exports = Class(View, function (supr) {
 	this._fingerUp = function() {
 		console.log('Finger Up');
 
+		GC.app.audioManager.play('bubbleShoot');
+
 		var gameController = this.getSuperview().gameController;
 
 		if(this.isShootActive && this.ammo[this.ammoType] > 0)
@@ -206,14 +217,20 @@ exports = Class(View, function (supr) {
 	this.switchAmmo = function() {
 		switch(this.ammoType) {
 			case GLOBAL.BUBBLE_TYPES.RED:
-				this.ammoType = GLOBAL.BUBBLE_TYPES.YELLOW;
+				this.ammoType = GLOBAL.BUBBLE_TYPES.BLUE;
 				break;
 			case GLOBAL.BUBBLE_TYPES.BLUE:
-				this.ammoType = GLOBAL.BUBBLE_TYPES.RED;
+				this.ammoType = GLOBAL.BUBBLE_TYPES.YELLOW;
 				break;
 			case GLOBAL.BUBBLE_TYPES.YELLOW:
-				this.ammoType = GLOBAL.BUBBLE_TYPES.BLUE;
+				this.ammoType = GLOBAL.BUBBLE_TYPES.RED;
 		}
+		this.emit('Switch Ammo');
+	};
+
+	this.updateAmmo = function(ammoType, amount) {
+		this.ammo[ammoType] += amount;
+		this.emit('Update Ammo');
 	};
 
 	this.build = function () {
@@ -284,6 +301,7 @@ exports = Class(View, function (supr) {
 		*/
 		this.gestureView.on('InputStart', bind(this, function(event, point) {
 			console.log('Finger Down');
+			console.log(point);
 			this.isShootActive = true;
 			//Draw ray to calculate where bubble will go
 			this._setAim(point);
