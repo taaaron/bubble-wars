@@ -43,6 +43,15 @@ exports = Class(View, function (supr) {
     this.showVictory = function() {
         this.style.visible = true;
         this.victoryView.style.visible = true;
+        this.victoryView.setHeaderText('VICTORY');
+
+        this._victoryAnimator.then({opacity: 1}, 300);
+    };
+
+    this.showDefeat = function() {
+        this.style.visible = true;
+        this.victoryView.style.visible = true;
+        this.victoryView.setHeaderText('DEFEAT');
 
         this._victoryAnimator.then({opacity: 1}, 300);
     };
@@ -78,6 +87,7 @@ exports = Class(View, function (supr) {
 
         this.promptView.on('Close Prompt', bind(this, function() {
             GC.app.audioManager.play('buttonClick');
+            this.getSuperview().gameController.emit('Update Enemy');
             this.hidePrompt();
         }));
 

@@ -45,6 +45,8 @@ exports = Class(View, function (supr) {
 			[GLOBAL.BUBBLE_TYPES.YELLOW]: null
 		};
 
+		this.isShooting = false;
+
 		this.build();
 	};
 
@@ -148,7 +150,7 @@ exports = Class(View, function (supr) {
 	/*
 	Reload after a shot if have enough ammo
 	*/
-	this._reloadAmmo = function(ammoType) {
+	this.reloadAmmo = function(ammoType) {
 		if(this.getSuperview().ammo[ammoType] > 0)
 		{
 			switch(ammoType) {
@@ -161,6 +163,8 @@ exports = Class(View, function (supr) {
 				case GLOBAL.BUBBLE_TYPES.YELLOW:
 					this._loadYellowBubble();
 			}
+		} else {
+			this.loadedBubbles[ammoType] = null;
 		}
 	};
 
@@ -176,6 +180,8 @@ exports = Class(View, function (supr) {
 	*/
 	this.shootBubble = function(ammoType, positions, gridSpace, gameController) {
 		var loadedBubble = this.loadedBubbles[ammoType];
+
+		this.isShooting = true;
 
 		GC.app.audioManager.play('bubbleShoot');
 
@@ -195,8 +201,9 @@ exports = Class(View, function (supr) {
 
 		loadedBubble.animator.then(bind(this, function() {
 			gameController.snapBubble(gridSpace.bubbleCol, gridSpace.bubbleRow, loadedBubble);
-			this._reloadAmmo(ammoType);
-		}));
+			this.reloadAmmo(ammoType);
+			this.isShooting = false;
+		}))
 	};
 
 	this.build = function () {

@@ -203,7 +203,7 @@ exports = Class(View, function (supr) {
 	this._fingerUp = function() {
 		var gameController = this.getSuperview().gameController;
 
-		if(this.isShootActive && this.ammo[this.ammoType] > 0)
+		if(this.isShootActive && this.ammo[this.ammoType] > 0 && !this.shooter.isShooting)
 			this.shooter.shootBubble(this.ammoType, this.firePositions, this.shotGridSpace, gameController);
 		else
 			GC.app.audioManager.play('noAmmo');
@@ -236,7 +236,24 @@ exports = Class(View, function (supr) {
 	*/
 	this.updateAmmo = function(ammoType, amount) {
 		this.ammo[ammoType] += amount;
+		if(!this.shooter.loadedBubbles[ammoType])
+			this.shooter.reloadAmmo(ammoType);
+
 		this.emit('Update Ammo');
+	};
+
+	/*
+	Function to determine if out of ammo
+	*/
+	this.isAmmoEmpty = function() {
+		var totalAmmo = this.ammo[GLOBAL.BUBBLE_TYPES.RED] + 
+						this.ammo[GLOBAL.BUBBLE_TYPES.BLUE] + 
+						this.ammo[GLOBAL.BUBBLE_TYPES.YELLOW];
+
+		if(totalAmmo <= 0)
+			return true;
+		else
+			return false;
 	};
 
 	this.build = function () {

@@ -24,6 +24,20 @@ exports = Class(View, function (supr) {
 		this.build();
     };
 
+    this._determineMusicIcon = function() {
+        if(GC.app.audioManager.getMusicMuted())
+            return musicOffIcon;
+        else
+            return musicOnIcon;
+    };
+
+    this._determineEffectsIcon = function() {
+        if(GC.app.audioManager.getEffectsMuted())
+            return audioOffIcon;
+        else
+            return audioOnIcon;
+    };
+
     this.build = function() {
         this._blackOverlay = new View({
             superview: this,
@@ -96,7 +110,7 @@ exports = Class(View, function (supr) {
             y: GLOBAL.BASE_HEIGHT_CENTER + 110,
             width: 125,
             icon: {
-                image: musicOnIcon,
+                image: this._determineMusicIcon(),
                 x: 25,
                 y: 12,
                 width: 75,
@@ -107,12 +121,12 @@ exports = Class(View, function (supr) {
                     if(GC.app.audioManager.getMusicMuted()) {
                         GC.app.audioManager.setMusicMuted(false);
                         this.muteMusicButton.getSubviews()[1].updateOpts({
-                            image: musicOnIcon
+                            image: this._determineMusicIcon()
                         });
                     } else {
                         GC.app.audioManager.setMusicMuted(true);
                         this.muteMusicButton.getSubviews()[1].updateOpts({
-                            image: musicOffIcon
+                            image: this._determineMusicIcon()
                         });
                     }   
                 })
@@ -126,7 +140,7 @@ exports = Class(View, function (supr) {
             y: GLOBAL.BASE_HEIGHT_CENTER + 110,
             width: 125,
             icon: {
-                image: audioOnIcon,
+                image: this._determineEffectsIcon(),
                 x: 25,
                 y: 12,
                 width: 75,
@@ -137,12 +151,12 @@ exports = Class(View, function (supr) {
                     if(GC.app.audioManager.getEffectsMuted()) {
                         GC.app.audioManager.setEffectsMuted(false);
                         this.muteEffectsButton.getSubviews()[1].updateOpts({
-                            image: audioOnIcon
+                            image: this._determineEffectsIcon()
                         });
                     } else {
                         GC.app.audioManager.setEffectsMuted(true);
                         this.muteEffectsButton.getSubviews()[1].updateOpts({
-                            image: audioOffIcon
+                            image: this._determineEffectsIcon()
                         });
                     } 
                 })

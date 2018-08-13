@@ -20,6 +20,12 @@ exports = Class(View, function (supr) {
 		this.build();
     };
 
+    this.setHeaderText = function(text) {
+        this._victoryHeader.updateOpts({
+            text: text
+        });
+    };
+
     this.build = function() {
         this._blackOverlay = new View({
             superview: this,

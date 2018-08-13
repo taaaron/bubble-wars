@@ -54,6 +54,15 @@ exports = Class(View, function (supr) {
 			this.uiController.showVictory();
 		}));
 
+		this.gameController.on('Defeat', bind(this, function() {
+			GC.app.audioManager.play('defeat');
+			this.uiController.showDefeat();
+		}));
+
+		this.gameController.on('Update Enemy', bind(this, function() {
+			this.hudView.enemyCountView.updateCount(this.gameController.gameBoard.enemies.size);
+		}));
+
 		this.playerController.on('Switch Ammo', bind(this, function() {
 			GC.app.audioManager.play('shooterRotate');
 			this.hudView.ammoView.moveBacking(this.playerController.ammoType);

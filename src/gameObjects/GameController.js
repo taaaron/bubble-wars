@@ -244,14 +244,15 @@ exports = Class(View, function(supr) {
                 if(!GC.app.audioManager.isPlaying('bubblePop'))
                     GC.app.audioManager.play('bubblePop');
 
-                node.removeFromSuperview();
-                this.gameBoard.bubbleGrid[node.bubbleRow].bubbles[node.bubbleCol] = null;
-
                 if(node.enemy) {
-                    node.enemy.deathSequence();
+                    node.enemy.deathSequence(this);
                     this.gameBoard.screenShake();
                     this.gameBoard.enemies.delete(node.enemy);
+                    this.emit('Update Enemy');
                 }
+
+                node.removeFromSuperview();
+                this.gameBoard.bubbleGrid[node.bubbleRow].bubbles[node.bubbleCol] = null;
 
                 if(node.isFromPool)
                     this.getSuperview().playerController.shooter.releaseBubbleView(node);
@@ -283,6 +284,8 @@ exports = Class(View, function(supr) {
 
         if(this.gameBoard.enemies.size <= 0)
             this.emit('Victory');
+        if(this.getSuperview().playerController.isAmmoEmpty())
+            this.emit('Defeat');
     };
 
     this.build = function() {

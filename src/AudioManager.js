@@ -22,6 +22,9 @@ var audioManager = new AudioManager({
         buttonClick: {
             path: 'effects'
         },
+        defeat: {
+            path: 'effects'
+        },
         enemyDefeat: {
             path: 'effects',
             volume: 0.5

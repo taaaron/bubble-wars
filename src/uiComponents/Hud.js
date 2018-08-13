@@ -5,6 +5,7 @@ import ui.TextView as TextView;
 import ui.widget.ButtonView as ButtonView;
 
 import src.uiComponents.AmmoView as AmmoView;
+import src.uiComponents.EnemyCountView as EnemyCountView;
 
 var uiBackgroundImg = new Image({url: 'resources/images/ui/ui_bg.png'});
 
@@ -59,6 +60,12 @@ exports = Class(View, function (supr) {
             superview: this,
             x: 0,
             y: 0
+        });
+
+        this.enemyCountView = new EnemyCountView({
+            superview: this,
+            x: GLOBAL.BASE_WIDTH_CENTER - 50,
+            y: 25
         });
     };
 });

@@ -16,8 +16,11 @@ exports = Class(GC.Application, function () {
         GC.app.view.style.scale = device.screen.width / GLOBAL.BASE_WIDTH;
         GLOBAL.SCALE = GC.app.view.style.scale;
 
-        var titlescreen = new TitleScreen(),
-            gamescreen = new GameScreen();
+        this.audioManager = AudioManager.getAudioManager();
+        this.titleScreen = new TitleScreen(),
+        this.gameScreen = new GameScreen();
+
+        this.audioManager.play('bgMusic');
 
         var bgView = new ImageView({
             superview: this,
@@ -29,7 +32,7 @@ exports = Class(GC.Application, function () {
             clip: true
         });
 
-        var rootView = new StackView({
+        this.rootView = new StackView({
             superview: bgView,
             x: 0,
             y: 0,
@@ -38,18 +41,26 @@ exports = Class(GC.Application, function () {
             clip: true
         });
 
-        this.audioManager = AudioManager.getAudioManager();
+        this.rootView.push(this.titleScreen);
 
-        rootView.push(titlescreen);
-        this.audioManager.play('bgMusic');
+        this.titleScreen.on('Start Game', bind(this, function() {
+            this.rootView.push(this.gameScreen);
+        }));
 
-        titlescreen.on('Start Game', function() {
-            rootView.push(gamescreen);
-        });
+        this.setGameScreenEvents();
+    };
 
-        gamescreen.on('End Game', function() {
-            rootView.pop();
-        });
+    this.resetGameScreen = function() {
+        this.rootView.remove(this.gameScreen);
+        this.gameScreen = new GameScreen();
+        this.setGameScreenEvents();
+    };
+
+    this.setGameScreenEvents = function() {
+        this.gameScreen.on('End Game', bind(this, function() {
+            this.rootView.pop();
+            this.resetGameScreen(this.gameScreen);
+        }));
     };
 
     this.launchUI = function () {

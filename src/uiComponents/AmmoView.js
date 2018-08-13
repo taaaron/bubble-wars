@@ -4,7 +4,6 @@ import ui.ImageScaleView as ImageScaleView;
 import ui.ImageView as ImageView;
 import ui.resource.Image as Image;
 import ui.TextView as TextView;
-import ui.widget.ButtonView as ButtonView;
 
 var ammoBackingImg = new Image({url: 'resources/images/ui/ui_bg.png'});
 var redBubbleImg = new Image({url: "resources/images/gameObjects/bubble_red.png"}),
@@ -44,7 +43,7 @@ exports = Class(View, function (supr) {
         }, 100);
     };
 
-    this.updateAmmoCounts= function(ammo) {
+    this.updateAmmoCounts = function(ammo) {
         this._redAmmoCount.updateOpts({
             text: ammo[GLOBAL.BUBBLE_TYPES.RED]
         });
