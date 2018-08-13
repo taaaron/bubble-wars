@@ -56,7 +56,7 @@ exports = Class(ImageView, function (supr) {
 			];
 		}
 
-		return determinedOffsets;
+		this.neighborOffsets = determinedOffsets;
 	};
 
 	this.updateCollisionCircle = function() {
@@ -88,7 +88,7 @@ exports = Class(ImageView, function (supr) {
 	
 	this.build = function () {
 		this.updateCollisionCircle();
-		this.neighborOffsets = this.determineNeighborOffsets();
+		this.determineNeighborOffsets();
 
 		this.pEngine = new ParticleEngine({
 			superview: this,

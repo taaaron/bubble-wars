@@ -14,9 +14,9 @@ exports = function() {
     };
 
     GLOBAL.STARTING_AMMO = {
-        RED: 5,
-        BLUE: 5,
-        YELLOW: 5
+        RED: 3,
+        BLUE: 3,
+        YELLOW: 3
     };
     
     GLOBAL.BASE_WIDTH = 576;
