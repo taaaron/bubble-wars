@@ -168,6 +168,8 @@ exports = Class(View, function (supr) {
 				});
 
 				this.firePositions.push(reticlePos);
+			} else {
+				this.isShootActive = false;
 			}
 
 			if(bounceLine) {
@@ -200,9 +202,6 @@ exports = Class(View, function (supr) {
 
 	this._fingerUp = function() {
 		console.log('Finger Up');
-
-		GC.app.audioManager.play('bubbleShoot');
-
 		var gameController = this.getSuperview().gameController;
 
 		if(this.isShootActive && this.ammo[this.ammoType] > 0)
@@ -291,10 +290,6 @@ exports = Class(View, function (supr) {
 			{x: GLOBAL.BASE_WIDTH, y: 0},
 			{x: GLOBAL.BASE_WIDTH, y: GLOBAL.BASE_HEIGHT}
 		);
-		this.topBound = new Line(
-			{x: 0, y: 0},
-			{x: GLOBAL.BASE_WIDTH, y: 0}
-		); //TODO: This should actually be at where top of gameBoard is not top of screen
 
 		/*
 		Finger Down Event
@@ -303,7 +298,6 @@ exports = Class(View, function (supr) {
 			console.log('Finger Down');
 			console.log(point);
 			this.isShootActive = true;
-			//Draw ray to calculate where bubble will go
 			this._setAim(point);
 		}));
 
@@ -311,9 +305,6 @@ exports = Class(View, function (supr) {
 		Finger Drag Event
 		*/
 		this.gestureView.on('Drag', bind(this, function(startEvt, dragEvt, delta) {
-			//if overlap with location of shooter then stop working. MAke sure not to shoot. Turn isShootActive to false
-			//Update ray of where bubble will go
-
 			var point = {x: dragEvt.srcPt.x / GLOBAL.SCALE, y: dragEvt.srcPt.y / GLOBAL.SCALE};
 
 			if(this._checkInputWithinBounds(point)) {

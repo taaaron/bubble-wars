@@ -10,7 +10,7 @@ var audioManager = new AudioManager({
         },
         bubbleAbsorb: {
             path: 'effects',
-            volume: 0.5
+            volume: 0.2
         },
         bubblePop: {
             path: 'effects',

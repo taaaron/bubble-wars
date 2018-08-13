@@ -16,7 +16,8 @@ exports = Class(View, function(supr) {
         opts = merge(opts, {
             tag: 'GameBoard',
             width: GLOBAL.BASE_WIDTH,
-            height: GLOBAL.BASE_HEIGHT * GLOBAL.BOARD_SCALE
+            height: GLOBAL.BASE_HEIGHT * GLOBAL.BOARD_SCALE,
+            centerAnchor: true
         });
 
         supr(this, 'init', [opts]);
@@ -122,6 +123,10 @@ exports = Class(View, function(supr) {
             }));
         }  
     };
+
+    this.screenShake = function() {
+        this._animator.then({r: Math.PI / 100}, 75, 'easeOutElastic').then({r: -Math.PI / 100}, 75, 'easeOutElastic').then({r: 0}, 50, 'easeOutElastic');
+    }
 
     this.build = function() {
         for(var y = 0; y < layout.length; y++){

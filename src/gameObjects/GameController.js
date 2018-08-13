@@ -159,22 +159,26 @@ exports = Class(View, function(supr) {
 
         var masterList = [];
 
-        for(row of this.gameBoard.bubbleGrid) {
+        for(var row of this.gameBoard.bubbleGrid) {
             if(!row.isRowNull()) {
                 masterList = masterList.concat(row.bubbles);
             }
         }
 
-        for(node of masterList) {
+        for(var node of masterList) {
             if(node && !visitedBubbles.includes(node)) {
-                //These should drop and then be absorbed by shooter to raise ammo count and possibly super charge
-                GC.app.audioManager.play('bubbleAbsorb');
-
-                this.getSuperview().playerController.updateAmmo(node.type, 1);
-                node.removeFromSuperview();
                 this.gameBoard.bubbleGrid[node.bubbleRow].bubbles[node.bubbleCol] = null;
-                if(node.isFromPool)
-                    this.getSuperview().playerController.shooter.releaseBubbleView(node);
+                this.getSuperview().playerController.updateAmmo(node.type, 1);
+                if(!GC.app.audioManager.isPlaying('bubbleAbsorb'))
+                    GC.app.audioManager.play('bubbleAbsorb');
+                node.animator.then({
+                    x: GLOBAL.BASE_WIDTH_CENTER,
+                    y: this.getSuperview().playerController.shooter.getPosition().y,
+                }, 300, 'easeOutCubic').then(bind(this, function(node) {
+                    node.removeFromSuperview();
+                    if(node.isFromPool)
+                        this.getSuperview().playerController.shooter.releaseBubbleView(node);
+                }, node));
             }
         }
     };
@@ -207,26 +211,24 @@ exports = Class(View, function(supr) {
 
         if(cluster.length >= 3) {
             for(var node of cluster) {
-                //eventually will have sound and animation here and then remove afterwards
                 GC.app.audioManager.stop('bubbleShoot');
-                GC.app.audioManager.play('bubblePop');
+                if(!GC.app.audioManager.isPlaying('bubblePop'))
+                    GC.app.audioManager.play('bubblePop');
 
                 node.removeFromSuperview();
                 this.gameBoard.bubbleGrid[node.bubbleRow].bubbles[node.bubbleCol] = null;
                 if(node.enemy) {
-                    GC.app.audioManager.play('enemyDefeat', {time: 0.001, duration: 0.0018});
-                    //particle Effect?
-                    //screenShake???
+                    GC.app.audioManager.stop('bubbleShoot');
+                    GC.app.audioManager.stop('bubblePop');
+                    if(!GC.app.audioManager.isPlaying('enemyDefeat'))
+                        GC.app.audioManager.play('enemyDefeat', {time: 0.001, duration: 0.0018});
+                    this.gameBoard.screenShake();
                     this.gameBoard.enemies.delete(node.enemy);
                 }
                 if(node.isFromPool)
                     this.getSuperview().playerController.shooter.releaseBubbleView(node);
             }
         }
-    };
-
-    this.snapToNearestSpace = function() {
-        //If no collision then snap bubble to nearest open position
     };
 
     this.snapBubble = function(x, y, bubble) {

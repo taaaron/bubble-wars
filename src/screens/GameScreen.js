@@ -39,8 +39,7 @@ exports = Class(View, function (supr) {
 			superview: this,
 			x: 0,
 			y: 0,
-			zIndex: 4,
-			visible: false
+			zIndex: 4
 		});
 
 		this.hudView = new Hud({

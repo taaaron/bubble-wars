@@ -151,8 +151,9 @@ exports = Class(View, function (supr) {
 	};
 
 	this.shootBubble = function(ammoType, positions, gridSpace, gameController) {
-		//play sound
 		var loadedBubble = this.loadedBubbles[ammoType];
+
+		GC.app.audioManager.play('bubbleShoot');
 
 		this.getSuperview().updateAmmo(ammoType, -1);
 		loadedBubble.updateOpts({
@@ -163,7 +164,7 @@ exports = Class(View, function (supr) {
 		for(var position of positions) {
 			//Keep bubble from going off screen
 			position.x = position.x > GLOBAL.BASE_WIDTH - GLOBAL.BUBBLE_WIDTH ? GLOBAL.BASE_WIDTH - GLOBAL.BUBBLE_WIDTH : position.x;
-			loadedBubble.animator.then({x: position.x, y: position.y}, 150, 'easeOutCubic')
+			loadedBubble.animator.then({x: position.x, y: position.y}, 150, 'easeOutElastic');
 		}
 		loadedBubble.animator.then(bind(this, function() {
 			gameController.snapBubble(gridSpace.bubbleCol, gridSpace.bubbleRow, loadedBubble);
@@ -194,7 +195,6 @@ exports = Class(View, function (supr) {
 
 		this._shooterView.on('InputSelect', bind(this, function () {
 			console.log('clicked!');
-			//play sound
 			this._rotateShooter();
 		}));
 

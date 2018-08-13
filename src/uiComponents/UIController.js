@@ -3,6 +3,7 @@ import ui.View as View;
 
 import src.uiComponents.MenuView as MenuView;
 import src.uiComponents.VictoryView as VictoryView;
+import src.uiComponents.PromptView as PromptView;
 
 exports = Class(View, function (supr) {
 	this.init = function (opts) {
@@ -14,6 +15,14 @@ exports = Class(View, function (supr) {
 		supr(this, 'init', [opts]);
 
 		this.build();
+    };
+
+    this.hidePrompt = function() {
+        this._promptAnimator.then({opacity: 0}, 300)
+        .then(bind(this, function() {
+            this.style.visible = false;
+            this.promptView.style.visible = false;
+        }));
     };
 
     this.showMenu = function() {
@@ -39,6 +48,14 @@ exports = Class(View, function (supr) {
     };
 
     this.build = function() {
+        this.promptView = new PromptView({
+            superview: this,
+            x: 0,
+            y: 0,
+            opacity: 1,
+            visible: true
+        });
+        
         this.menuView = new MenuView({
             superview: this,
             x: 0,
@@ -55,8 +72,14 @@ exports = Class(View, function (supr) {
             visible: false
         });
 
+        this._promptAnimator = animate(this.promptView);
         this._menuAnimator = animate(this.menuView);
         this._victoryAnimator = animate(this.victoryView);
+
+        this.promptView.on('Close Prompt', bind(this, function() {
+            GC.app.audioManager.play('buttonClick');
+            this.hidePrompt();
+        }));
 
         this.menuView.on('Resume', bind(this, function() {
             GC.app.audioManager.play('buttonClick');

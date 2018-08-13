@@ -3,6 +3,7 @@ import ui.ImageView as ImageView;
 import ui.resource.Image as Image;
 import math.geom.Circle as Circle;
 import math.geom.Point as Point;
+import ui.ParticleEngine as ParticleEngine;
 
 var redBubbleImg = new Image({url: 'resources/images/gameObjects/bubble_red.png'});
 var adjustForImgX = 0;
@@ -70,10 +71,31 @@ exports = Class(ImageView, function (supr) {
 		var centerY = scaledPos.y - adjustForImgY + (GLOBAL.BUBBLE_WIDTH / 2);
 		this.collisionCircle = new Circle(centerX, centerY, GLOBAL.BUBBLE_WIDTH / 2);
 	};
+
+	this.shootParticles = function() {
+		var particleObjects = this.pEngine.obtainParticleArray(10);
+		for (var i = 0; i < 10; i++) {
+		  var pObj = particleObjects[i];
+		  pObj.dx = Math.random() * 100;
+		  pObj.dy = Math.random() * 100;
+		  pObj.ddy = 50;
+		  pObj.width = 20;
+		  pObj.height = 20;
+		  pObj.image = 'resources/images/particles/round_red.png';
+		}
+		this.pEngine.emitParticles(particleObjects);
+	};
 	
 	this.build = function () {
 		this.updateCollisionCircle();
 		this.neighborOffsets = this.determineNeighborOffsets();
+
+		this.pEngine = new ParticleEngine({
+			superview: this,
+			width: 1,
+			height: 1,
+			initCount: 10
+		});
 
 		/* Create an animator object for bubble.
 		 */

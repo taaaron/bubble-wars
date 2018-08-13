@@ -19,7 +19,6 @@ exports = Class(ButtonView, function (supr) {
                 horizontal: {left: 20, right: 20},
                 vertical: {top: 20, bottom: 20}
             },
-            title: 'BUTTON',
             text: {
                 color: 'white',
                 fontFamily: 'KenVector Future Thin',
