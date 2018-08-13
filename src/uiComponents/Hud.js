@@ -50,7 +50,6 @@ exports = Class(View, function (supr) {
             scaleMethod: 'stretch',
             on: {
                 up: bind(this, function () {
-                    console.log('menu click');
                     this.emit('Open Menu');
                 })
             }

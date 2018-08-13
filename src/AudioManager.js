@@ -29,6 +29,9 @@ var audioManager = new AudioManager({
         laserCharging: {
             path: 'effects'
         },
+        noAmmo: {
+            path: 'effects'
+        },
         shooterRotate: {
             path: 'effects'
         },

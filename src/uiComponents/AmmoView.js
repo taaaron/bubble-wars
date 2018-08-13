@@ -59,7 +59,7 @@ exports = Class(View, function (supr) {
     this.build = function() {
         this._redAmmoCount = new TextView({
             superview: this,
-            text: '25',
+            text: String(GLOBAL.STARTING_AMMO.RED),
             color: 'white',
             width: 100,
             height: 100/3,
@@ -80,7 +80,7 @@ exports = Class(View, function (supr) {
 
         this._blueAmmoCount = new TextView({
             superview: this,
-            text: '25',
+            text: String(GLOBAL.STARTING_AMMO.BLUE),
             color: 'white',
             width: 100,
             height: 100/3,
@@ -101,7 +101,7 @@ exports = Class(View, function (supr) {
 
         this._yellowAmmoCount = new TextView({
             superview: this,
-            text: '25',
+            text: String(GLOBAL.STARTING_AMMO.YELLOW),
             color: 'white',
             width: 100,
             height: 100/3,

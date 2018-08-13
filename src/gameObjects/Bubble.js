@@ -97,8 +97,6 @@ exports = Class(ImageView, function (supr) {
 			initCount: 10
 		});
 
-		/* Create an animator object for bubble.
-		 */
 		this.animator = animate(this);
 	};
 });

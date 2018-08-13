@@ -32,6 +32,9 @@ exports = Class(View, function(supr) {
         this.build();
     }
 
+    /*
+    Spawn a bubble given an identifier, grid position, and bubbleRow parent view
+    */
     this._spawnBubble = function(identifier, x, y, row) {
         var type, image;
 
@@ -76,18 +79,31 @@ exports = Class(View, function(supr) {
         return bubble;
     };
 
+    /*
+    Get y value modifier for a bubbleRow's position so that
+    they fit correctly in a hex pattern on screen
+    */
     this.getRowYModifier = function() {
         return (4/5);
     };
 
+    /*
+    Return length of the Grid's X axis
+    */
     this.getGridSizeX = function() {
         return this.bubbleGrid[0].bubbles.length;
     };
 
+    /*
+    Return length of the Grid's Y axis
+    */
     this.getGridSizeY = function() {
         return this.bubbleGrid.length;
     }
 
+    /*
+    Update the locatin of each bubble's collision circle to reflect new board position
+    */
     this.updateAllCollisionCircles = function() {
         for(var row of this.bubbleGrid) {
             for(var bubble of row.bubbles) {
@@ -97,6 +113,9 @@ exports = Class(View, function(supr) {
         }
     };
 
+    /*
+    Show more of the board on screen if too many null rows on screen
+    */
     this.showMoreBoard = function() {
         if(this.style.y !== 0) {
             var nullCount = 0;
@@ -115,8 +134,6 @@ exports = Class(View, function(supr) {
             } else {
                 newY = 0;
             }
-            console.log(nullCount);
-            console.log(newY);
     
             this._animator.then({y: newY}, 300).then(bind(this, function() {
                 this.updateAllCollisionCircles();
@@ -124,8 +141,13 @@ exports = Class(View, function(supr) {
         }  
     };
 
+    /*
+    Screen shake effect
+    */
     this.screenShake = function() {
-        this._animator.then({r: Math.PI / 100}, 75, 'easeOutElastic').then({r: -Math.PI / 100}, 75, 'easeOutElastic').then({r: 0}, 50, 'easeOutElastic');
+        this._animator.then({r: Math.PI / 100}, 75, 'easeOutElastic')
+            .then({r: -Math.PI / 100}, 75, 'easeOutElastic')
+            .then({r: 0}, 50, 'easeOutElastic');
     }
 
     this.build = function() {
@@ -148,8 +170,6 @@ exports = Class(View, function(supr) {
             this.bubbleGrid.push(row);
         }
 
-        /* Create an animator object for GameBoard.
-		 */
 		this._animator = animate(this);
     };
 });

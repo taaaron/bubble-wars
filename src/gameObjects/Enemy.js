@@ -1,3 +1,4 @@
+import animate;
 import ui.ImageView as ImageView;
 import ui.resource.Image as Image;
 
@@ -20,8 +21,14 @@ exports = Class(ImageView, function(supr) {
         this.build();
     };
 
-    //every three turns the enemies on screen will fire a laser at the player
-    //slowly charges every turn
+    this.deathSequence = function() {
+        GC.app.audioManager.stop('bubbleShoot');
+        GC.app.audioManager.stop('bubblePop');
+        if(!GC.app.audioManager.isPlaying('enemyDefeat'))
+            GC.app.audioManager.play('enemyDefeat', {time: 0.001, duration: 0.0018});
+
+        //TODO: death sequence animation here
+    };
 
     this.build = function() {
         this._enemyLaser = new ImageView({
@@ -32,5 +39,6 @@ exports = Class(ImageView, function(supr) {
             visible: false
         });
 
+        this._animator = animate(this);
     };
 });

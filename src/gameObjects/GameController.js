@@ -18,12 +18,17 @@ exports = Class(View, function(supr) {
         this.build();
     };
 
+    /*
+    returns the center of a grid point given its location as a point
+    */
     this._adjustGridPoint = function(point) {
         return point.translate(GLOBAL.BUBBLE_WIDTH / 2, GLOBAL.BUBBLE_WIDTH / 2);
     };
 
-    //returns closest colliding bubble or null
-    this.checkBubbleCollision = function(aimLine) {
+    /*
+    Returns the closest colliding bubble or null
+    */
+    this.getCollisionBubble = function(aimLine) {
         var bubbleGrid = this.gameBoard.bubbleGrid;
         var returnBubble = null;
 
@@ -49,6 +54,10 @@ exports = Class(View, function(supr) {
         return returnBubble;
     };
 
+    /*
+    Derives the location of a given grid space.
+    Expects an object with bubbleCol and bubbleRow
+    */
     this.getGridSpacePoint = function(space) {
         var spaceX = space.bubbleCol * GLOBAL.BUBBLE_WIDTH;
         var spaceY = space.bubbleRow * GLOBAL.BUBBLE_WIDTH * this.gameBoard.getRowYModifier() + this.gameBoard.style.y;
@@ -59,6 +68,10 @@ exports = Class(View, function(supr) {
         return new Point({x: spaceX, y: spaceY});
     };
 
+    /*
+    Gets all open grid locations surrounding a bubble and 
+    returns them in an array of objects with bubbleCol and bubbleRow
+    */
     this.getOpenNeighborSpaces = function(bubble) {
         var row, col;
         var openSpaces = [];
@@ -76,6 +89,9 @@ exports = Class(View, function(supr) {
         return openSpaces;
     };
 
+    /*
+    Determines the valid grid space for player to shoot at given a bubble and collision point
+    */
     this.determineGridSpace = function(bubble, collidePoint) {
         var returnSpace = null;
         var openGridSpaces = this.getOpenNeighborSpaces(bubble);
@@ -95,11 +111,12 @@ exports = Class(View, function(supr) {
             } 
         }
 
-        console.log(returnSpace);
-
         return returnSpace;
     };
-    
+
+    /*
+    Gets next valid bubble nearest to collision point
+    */
     this.getNextBubble = function(bubble, collidePoint, visitedBubbles) {
         var returnBubble = null;
         var row, col, returnDistance, currDistance, tempBubble;
@@ -124,16 +141,20 @@ exports = Class(View, function(supr) {
             }
         }
 
-        console.log(returnBubble);
-
         return returnBubble;
     };
 
+
+    /*
+    Search for detached islands of Bubbles and drop them
+    */
     this.findIslands = function() {
         var visitedBubbles = [];
+        var masterList = [];
         var stack = [];
         var row, col, currBubble, tempBubble;
 
+        //grab all enemies and find the bubbles connected to them
         this.gameBoard.enemies.forEach(bind(this, function(enemy) {
             row = enemy.getSuperview().bubbleRow;
             col = enemy.getSuperview().bubbleCol;
@@ -157,45 +178,52 @@ exports = Class(View, function(supr) {
             }
         }));
 
-        var masterList = [];
-
+        //build a master list of all bubbles on the board
         for(var row of this.gameBoard.bubbleGrid) {
             if(!row.isRowNull()) {
                 masterList = masterList.concat(row.bubbles);
             }
         }
 
+        //remove all bubbles that are not connected to an enemy
         for(var node of masterList) {
             if(node && !visitedBubbles.includes(node)) {
                 this.gameBoard.bubbleGrid[node.bubbleRow].bubbles[node.bubbleCol] = null;
                 this.getSuperview().playerController.updateAmmo(node.type, 1);
+
                 if(!GC.app.audioManager.isPlaying('bubbleAbsorb'))
                     GC.app.audioManager.play('bubbleAbsorb');
+
                 node.animator.then({
                     x: GLOBAL.BASE_WIDTH_CENTER,
                     y: this.getSuperview().playerController.shooter.getPosition().y,
-                }, 300, 'easeOutCubic').then(bind(this, function(node) {
-                    node.removeFromSuperview();
-                    if(node.isFromPool)
-                        this.getSuperview().playerController.shooter.releaseBubbleView(node);
-                }, node));
+                }, 300, 'easeOutCubic')
+                    .then(bind(this, function(node) {
+                        node.removeFromSuperview();
+                        if(node.isFromPool)
+                            this.getSuperview().playerController.shooter.releaseBubbleView(node);
+                    }, node));
             }
         }
     };
 
+    /*
+    Finds all bubbles of same type connected to given bubble
+    */
     this.findCluster = function(bubble) {
         var stack = [bubble];
         var visitedBubbles = [bubble];
         var cluster = [];
         var currBubble;
 
+        //While the stack is not empty, find connected bubbles of same type and add them to cluster
         while(stack.length !== 0) {
+            var row, col, tempBubble;
+
             currBubble = stack.pop();
             cluster.push(currBubble);
-
-            //find all neighbors that have same type and havnt been visited add them to stack
-            var row, col, tempBubble;
     
+            //find all neighbors that have same type and havnt been visited  and add them to the stack
             for(var offset of currBubble.neighborOffsets) {
                 row = currBubble.bubbleRow + offset.y;
                 col = currBubble.bubbleCol + offset.x;
@@ -209,6 +237,7 @@ exports = Class(View, function(supr) {
             }
         }
 
+        //If cluster is larger than 3, remove the cluster from the board
         if(cluster.length >= 3) {
             for(var node of cluster) {
                 GC.app.audioManager.stop('bubbleShoot');
@@ -217,20 +246,22 @@ exports = Class(View, function(supr) {
 
                 node.removeFromSuperview();
                 this.gameBoard.bubbleGrid[node.bubbleRow].bubbles[node.bubbleCol] = null;
+
                 if(node.enemy) {
-                    GC.app.audioManager.stop('bubbleShoot');
-                    GC.app.audioManager.stop('bubblePop');
-                    if(!GC.app.audioManager.isPlaying('enemyDefeat'))
-                        GC.app.audioManager.play('enemyDefeat', {time: 0.001, duration: 0.0018});
+                    node.enemy.deathSequence();
                     this.gameBoard.screenShake();
                     this.gameBoard.enemies.delete(node.enemy);
                 }
+
                 if(node.isFromPool)
                     this.getSuperview().playerController.shooter.releaseBubbleView(node);
             }
         }
     };
 
+    /*
+    Snaps given bubble to given x and y position in the bubbleGrid
+    */
     this.snapBubble = function(x, y, bubble) {
         var newRow = this.gameBoard.bubbleGrid[y];
 
@@ -239,6 +270,7 @@ exports = Class(View, function(supr) {
             x: x * BUBBLE_WIDTH,
             y: 0,
         });
+
         bubble.bubbleRow = y;
         bubble.bubbleCol = x;
         bubble.determineNeighborOffsets();

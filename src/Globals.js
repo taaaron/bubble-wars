@@ -12,6 +12,12 @@ exports = function() {
         NULL: 'n',
         ENEMY: 'e'
     };
+
+    GLOBAL.STARTING_AMMO = {
+        RED: 5,
+        BLUE: 5,
+        YELLOW: 5
+    };
     
     GLOBAL.BASE_WIDTH = 576;
     GLOBAL.BASE_HEIGHT = 1024;

@@ -23,43 +23,33 @@ exports = Class(View, function (supr) {
 		supr(this, 'init', [opts]);
 
 		this.ammo = {
-			[GLOBAL.BUBBLE_TYPES.RED]: 25,
-			[GLOBAL.BUBBLE_TYPES.BLUE]: 25,
-			[GLOBAL.BUBBLE_TYPES.YELLOW]: 25
+			[GLOBAL.BUBBLE_TYPES.RED]: GLOBAL.STARTING_AMMO.RED,
+			[GLOBAL.BUBBLE_TYPES.BLUE]: GLOBAL.STARTING_AMMO.BLUE,
+			[GLOBAL.BUBBLE_TYPES.YELLOW]: GLOBAL.STARTING_AMMO.YELLOW
 		};
 		this.maxHP = 100;
 		this.currHP = 100;
 		this.ammoType = GLOBAL.BUBBLE_TYPES.RED;
 
 		this.isShootActive = false;
-
 		this.firePositions = [];
 		this.shotGridSpace;
 
 		this._shooterAbsPos = {
 			x: GLOBAL.BASE_WIDTH / 2,
 			y: GLOBAL.BASE_HEIGHT * GLOBAL.BOARD_SCALE
-		}; //Needed to be hardcoded because was getting odd behavior from this.shooter.getPosition()
+		};
 
 		this.build();
 	};
 
-	this._adjustXForShooter = function(x) {
-		return this._shooterAbsPos.x - x;
-	};
-
-	this._adjustYForShooter = function(y) {
-		return this._shooterAbsPos.y + y;
-	};
-
-	//get collideBubble and then find open space for reticle based on where aimLine intersects the bubble
+	/*
+	Find where aiming reticle should be positioned based on collision Point
+	*/
 	this._getReticlePos = function(collideBubble, collidePoint) {
 		var gridSpace = null;
 		var targetBubble = collideBubble;
 		var visitedBubbles = [];
-
-		console.log('collideBubble', collideBubble);
-		console.log('collidePoint', collidePoint);
 		
 		while(gridSpace === null) {
 			gridSpace = this.getSuperview().gameController.determineGridSpace(targetBubble, collidePoint);
@@ -72,6 +62,9 @@ exports = Class(View, function (supr) {
 		return this.getSuperview().gameController.getGridSpacePoint(gridSpace);
 	};
 
+	/*
+	Builds aiming line for shots that will be bounced off of the side of the screen
+	*/
 	this._buildBounceLine = function(aimLine) {
 		var gameBoardPos = this.getSuperview().gameController.gameBoard.getPosition();
 		var tempLine = new Line(aimLine.end, {
@@ -83,6 +76,9 @@ exports = Class(View, function (supr) {
 		return new Line(tempLine.start, endPoint);
 	};
 
+	/*
+	Builds initial aiming line for shots
+	*/
 	this._buildAimLine = function(shooterPos, fingerPoint) {
 		var gameBoardPos = this.getSuperview().gameController.gameBoard.getPosition();
 		var endPoint;
@@ -94,11 +90,14 @@ exports = Class(View, function (supr) {
 		return new Line(shooterPos, endPoint);
 	};
 
+	/*
+	Handles the building of all aiming calculations and aiming views given a fingerPoint
+	*/
 	this._setAim = function(fingerPoint) {
 		this.firePositions = [];
 		var rotation = utils.getAngle(this._shooterAbsPos, fingerPoint);
 		var aimLine = this._buildAimLine(this._shooterAbsPos, fingerPoint);
-		var collideBubble = this.getSuperview().gameController.checkBubbleCollision(aimLine);
+		var collideBubble = this.getSuperview().gameController.getCollisionBubble(aimLine);
 		var collidePoint, reticlePos, bounceLine, bounceRotation;
 
 		//hide reticle and bounceView by default
@@ -113,10 +112,6 @@ exports = Class(View, function (supr) {
 		if(collideBubble) {
 			collidePoint = utils.getLineCircleIntersection(aimLine, collideBubble.collisionCircle);
 			reticlePos = this._getReticlePos(collideBubble, collidePoint);
-
-			console.log(collideBubble);
-			console.log(collidePoint);
-			console.log(reticlePos);
 
 			this._aimLaserView.updateOpts({
 				x: collidePoint.x,
@@ -142,16 +137,14 @@ exports = Class(View, function (supr) {
 				aimLine = new Line(aimLine.start, aimEnd);
 				bounceLine = this._buildBounceLine(aimLine);
 				bounceRotation = utils.getAngle2(bounceLine.start, bounceLine.end) - Math.PI/2;
-				console.log('bounceLine', bounceLine);
-				collideBubble = this.getSuperview().gameController.checkBubbleCollision(bounceLine);
+				collideBubble = this.getSuperview().gameController.getCollisionBubble(bounceLine);
 			} else if(utils.getLineLineIntersection(aimLine, this.rightBound)  && fingerPoint.x > GLOBAL.BASE_WIDTH_CENTER) {
 				//bounce off right side
 				aimEnd = utils.getLineLineIntersection(aimLine, this.rightBound);
 				aimLine = new Line(aimLine.start, aimEnd);
 				bounceLine = this._buildBounceLine(aimLine);
 				bounceRotation = utils.getAngle2(bounceLine.start, bounceLine.end) - Math.PI/2;
-				console.log('bounceLine', bounceLine);
-				collideBubble = this.getSuperview().gameController.checkBubbleCollision(bounceLine);
+				collideBubble = this.getSuperview().gameController.getCollisionBubble(bounceLine);
 			}
 
 			this.firePositions.push(aimLine.end);
@@ -169,6 +162,7 @@ exports = Class(View, function (supr) {
 
 				this.firePositions.push(reticlePos);
 			} else {
+				//disable shooting if no target
 				this.isShootActive = false;
 			}
 
@@ -194,18 +188,25 @@ exports = Class(View, function (supr) {
 		}
 	};
 
+	/*
+	Check if player input is within allowed area for aiming
+	*/
 	this._checkInputWithinBounds = function(point) {
 		return point.x >= 0 && point.x <= this.gestureView.style.width ? (
 			point.y >= 0 && point.y <= this.gestureView.style.height ? true : false
 		) : false;
 	};
 
+	/*
+	Defines behavior for when players lifts finger off of screen
+	*/
 	this._fingerUp = function() {
-		console.log('Finger Up');
 		var gameController = this.getSuperview().gameController;
 
 		if(this.isShootActive && this.ammo[this.ammoType] > 0)
 			this.shooter.shootBubble(this.ammoType, this.firePositions, this.shotGridSpace, gameController);
+		else
+			GC.app.audioManager.play('noAmmo');
 
 		this._aimLaserView.style.visible = false;
 		this._bounceLaserView.style.visible = false;
@@ -213,6 +214,9 @@ exports = Class(View, function (supr) {
 		this.isShootActive = false;
 	};
 
+	/*
+	Switch current ammo type and emit event to update UI
+	*/
 	this.switchAmmo = function() {
 		switch(this.ammoType) {
 			case GLOBAL.BUBBLE_TYPES.RED:
@@ -227,6 +231,9 @@ exports = Class(View, function (supr) {
 		this.emit('Switch Ammo');
 	};
 
+	/*
+	Function to adjust ammo count and emit event to update UI
+	*/
 	this.updateAmmo = function(ammoType, amount) {
 		this.ammo[ammoType] += amount;
 		this.emit('Update Ammo');
@@ -295,8 +302,6 @@ exports = Class(View, function (supr) {
 		Finger Down Event
 		*/
 		this.gestureView.on('InputStart', bind(this, function(event, point) {
-			console.log('Finger Down');
-			console.log(point);
 			this.isShootActive = true;
 			this._setAim(point);
 		}));

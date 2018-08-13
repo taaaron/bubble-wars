@@ -120,7 +120,7 @@ exports = Class(View, function (supr) {
             zIndex: 3
         });
 
-        this.muteAllButton = new BasicButton({
+        this.muteEffectsButton = new BasicButton({
             superview: this,
             x: GLOBAL.BASE_WIDTH_CENTER + 25,
             y: GLOBAL.BASE_HEIGHT_CENTER + 110,
@@ -134,14 +134,14 @@ exports = Class(View, function (supr) {
             },
             on: {
                 up: bind(this, function () {
-                    if(GC.app.audioManager.getMuted()) {
-                        GC.app.audioManager.setMuted(false);
-                        this.muteAllButton.getSubviews()[1].updateOpts({
+                    if(GC.app.audioManager.getEffectsMuted()) {
+                        GC.app.audioManager.setEffectsMuted(false);
+                        this.muteEffectsButton.getSubviews()[1].updateOpts({
                             image: audioOnIcon
                         });
                     } else {
-                        GC.app.audioManager.setMuted(true);
-                        this.muteAllButton.getSubviews()[1].updateOpts({
+                        GC.app.audioManager.setEffectsMuted(true);
+                        this.muteEffectsButton.getSubviews()[1].updateOpts({
                             image: audioOffIcon
                         });
                     } 

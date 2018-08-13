@@ -51,7 +51,6 @@ exports = Class(View, function (supr) {
 
 		this.gameController.on('Victory', bind(this, function() {
 			GC.app.audioManager.play('victory');
-			console.log('victory');
 			this.uiController.showVictory();
 		}));
 

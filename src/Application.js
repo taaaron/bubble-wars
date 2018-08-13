@@ -44,14 +44,10 @@ exports = Class(GC.Application, function () {
         this.audioManager.play('bgMusic');
 
         titlescreen.on('Start Game', function() {
-            //TODO: Have ui fade out smoothly into loading screen
-            //TODO: Loading screen, preload game assets, then bring in game screen
             rootView.push(gamescreen);
         });
 
         gamescreen.on('End Game', function() {
-            //TODO: Fade out smoothly into loading screen
-            //TODO: Loading screen, preload menu assets, then title screen
             rootView.pop();
         });
     };
