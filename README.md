@@ -17,7 +17,7 @@ Fork the bubble-wars repo and pull a local version onto your machine. Then go in
 devkit install
 ```
 
-Once that install completes, you will need to install the fonts used by the game onto your machine locally. To do this on Windows, copy the files inside of bubble-wars/resources/fonts folder into your Windows/Fonts folder wherever your OS is installed.
+Once that install completes, you will need to install the fonts used by the game onto your machine locally. To do this on Windows, copy the files inside of bubble-wars\resources\fonts folder into your Windows\Fonts folder on whichever drive your OS is installed.
 
 You are now ready to run the game locally by running the following command:
 
