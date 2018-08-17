@@ -41,7 +41,9 @@ This will open up the game in a new tab and you are ready to play!
  - The bubbles are anchored to the enemies so even if they are floating, if they are connected to an alien, they will not drop.
  - The menu screen is the cog icon in the bottom corner of the game screen.
 
-### Install Issues
+## Install Issues
+
+### uTime Error
 
 ```
 Error: EINVAL: invalid argument, utime
