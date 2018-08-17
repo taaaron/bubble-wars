@@ -23,7 +23,7 @@ Once that install completes, you are ready to run the game by running the comman
 devkit serve
 ```
 
-If you run into errors at this step please refer to the Common Install Issues section below.
+If you run into errors at this step please refer to the **Install Issues** section below.
 
 The game runs on localhost:9200 by default. All you need to do now is open your internet browser of choice point to localhost:9200.
 
@@ -41,9 +41,25 @@ This will open up the game in a new tab and you are ready to play!
  - The bubbles are anchored to the enemies so even if they are floating, if they are connected to an alien, they will not drop.
  - The menu screen is the cog icon in the bottom corner of the game screen.
 
-### Common Install Issues
+### Install Issues
 
+```
+Error: EINVAL: invalid argument, utime
+```
 
+Go into the ./modules/src/build/streams/write-files.js file and adjust lines 34 and 35 from this:
+
+```
+var atime = file.stat.atime.getTime();
+var mtime = file.stat.mtime.getTime();
+```
+
+to this:
+
+```
+var atime = file.stat.atime;
+var mtime = file.stat.mtime;
+```
 
 ## Author
 
