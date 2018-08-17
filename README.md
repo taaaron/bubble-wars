@@ -31,7 +31,7 @@ On that page click on the Bubble Wars option and then click 'simulate' on the to
 
 This will open up the game in a new tab and you are ready to play!
 
-### Game Controls
+## Game Controls
 
  - Click on the tri-shooter to switch which type of bubble will be fired.
  - Click and drag anywhere above the tri-shooter to aim. Bouncing your shots off of the wall is also a feature in the game!
