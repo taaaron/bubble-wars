@@ -11,13 +11,15 @@ Follow the instructions from [here](https://github.com/gameclosure/devkit/wiki/I
 
 ### Installing
 
-Fork the bubble-wars repo and pull a local version onto your machine. Then go into the bubble wars folder and run the following command:
+Fork the bubble-wars repo and pull a local version onto your machine. Then go into the bubble wars folder and run the following command using some type of command line or terminal:
 
 ```
 devkit install
 ```
 
-Once that install completes, you are ready to run the game by running the command:
+Once that install completes, you will need to install the fonts used by the game onto your machine locally. To do this on Windows, copy the files inside of bubble-wars/resources/fonts folder into your Windows/Fonts folder wherever your OS is installed.
+
+You are now ready to run the game locally by running the following command:
 
 ```
 devkit serve
