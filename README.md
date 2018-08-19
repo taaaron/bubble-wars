@@ -51,7 +51,7 @@ This will open up the game in a new tab and you are ready to play!
 Error: EINVAL: invalid argument, utime
 ```
 
-Go into the ./modules/src/build/streams/write-files.js file and adjust lines 34 and 35 from this:
+Go into the ./modules/devkit-core/src/build/streams/write-files.js file and adjust lines 34 and 35 from this:
 
 ```
 var atime = file.stat.atime.getTime();
